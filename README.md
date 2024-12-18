@@ -1,4 +1,4 @@
-# Afin d'initialiser le projet pour décelopper localement suivre les étapes:
+# Afin d'initialiser le projet pour développer localement suivre les étapes:
 
 ## 1. Installer Python 3.11.2
 Sur le site https://www.python.org/downloads/  
