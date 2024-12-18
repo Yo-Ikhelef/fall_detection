@@ -1,0 +1,24 @@
+# Environnements virtuels
+venv/
+
+# Fichiers Python générés
+__pycache__/
+*.py[cod]
+
+# Configurations locales
+*.env
+.env
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Journaux et fichiers temporaires
+*.log
+*.tmp
+
+# Vidéos enregistrées
+recordings/
+
+# Dépendances (peuvent être installées via requirements.txt)
+*.egg-info/
