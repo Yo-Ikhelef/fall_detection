@@ -1,6 +1,6 @@
 # Afin d'initialiser le projet pour développer localement suivre les étapes:
 
-## 1. Installer Python 3.11.2
+## 1. Installer Python 3.9.2 ( la derniere version 3.11.2 peux probablement fonctionner)
 Sur le site https://www.python.org/downloads/  
 ou  
 sur mac et linux/wsl:
