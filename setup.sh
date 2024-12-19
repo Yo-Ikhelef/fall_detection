@@ -10,3 +10,4 @@ pip install -r requirements.txt
 
 echo "Configuration terminée ! Activez l'environnement virtuel avec :"
 echo "source venv/bin/activate"
+```
