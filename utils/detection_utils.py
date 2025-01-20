@@ -25,6 +25,15 @@ try:
         if movement_detected:
             print("Mouvement détecté !")
 
+        # Détecter une chute si un mouvement est détecté
+        fall_detected = False
+        if movement_detected:
+            fall_detected = motion_detector.detect_fall(frame, prev_frame)
+
+        # Afficher un message en cas de chute détectée
+        if fall_detected:
+            print("Alerte : Chute détectée !")
+
         # Dessiner les contours sur l'image actuelle
         instance_contours = Contours(frame)  # Créez une instance pour traiter la frame actuelle
         frame_with_contours = instance_contours.draw_contours(frame)
@@ -42,4 +51,3 @@ finally:
     # Libérer les ressources
     cam.release()
     cv2.destroyAllWindows()
-    
