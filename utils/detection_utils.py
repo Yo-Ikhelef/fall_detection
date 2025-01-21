@@ -13,6 +13,7 @@ frame_updater = UpdateFrame()
 
 try:
     prev_frame = None  # Frame précédente pour la détection de mouvements
+    fall_counter = 0
 
     while True:
         # Obtenir une frame depuis la caméra
@@ -21,18 +22,14 @@ try:
         # Vérifier la détection de mouvement
         movement_detected = motion_detector.movement_detections(frame, prev_frame)
 
-        # Si un mouvement est détecté, afficher un message
-        if movement_detected:
-            print("Mouvement détecté !")
-
         # Détecter une chute si un mouvement est détecté
         fall_detected = False
         if movement_detected:
             fall_detected = motion_detector.detect_fall(frame, prev_frame)
 
-        # Afficher un message en cas de chute détectée
         if fall_detected:
-            print("Alerte : Chute détectée !")
+            fall_counter += 1
+            print(f"Chute détectée : {fall_counter}")
 
         # Dessiner les contours sur l'image actuelle
         instance_contours = Contours(frame)  # Créez une instance pour traiter la frame actuelle
@@ -51,3 +48,4 @@ finally:
     # Libérer les ressources
     cam.release()
     cv2.destroyAllWindows()
+    
