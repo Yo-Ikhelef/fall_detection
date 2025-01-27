@@ -1,0 +1,1 @@
+# Ce fichier est vide, mais est nécessaire pour reconnaître 'core' comme un package.

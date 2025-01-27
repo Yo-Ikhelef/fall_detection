@@ -1,7 +1,10 @@
 import cv2
+import os
+from datetime import datetime
 
 class VideoRecorder:
-    def __init__(self, output_path="output.avi", fourcc="MJPG", fps=20, timeout=100):
+    def __init__(self, output_dir="recordings", fourcc="MJPG", fps=20, timeout=100):
+        self.output_dir = output_dir
         self.output_file = None
         self.fourcc = cv2.VideoWriter_fourcc(*fourcc)
         self.fps = fps
@@ -9,11 +12,20 @@ class VideoRecorder:
         self.timeout = timeout
         self.counter = 0
         self.timeout_counter = 0
-        self.output_path = output_path
+
+        # Vérifier si le dossier recordings existe, sinon le créer
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+    def _generate_filename(self):
+        now = datetime.now()
+        timestamp = now.strftime("%d-%m-%Y_%Hh%Mm%Ss")
+        return os.path.join(self.output_dir, f"recording_{timestamp}.avi")
 
     def start_recording(self, frame_size):
         if not self.recording:
-            self.output_file = cv2.VideoWriter(self.output_path, self.fourcc, self.fps, frame_size)
+            filename = self._generate_filename()
+            self.output_file = cv2.VideoWriter(filename, self.fourcc, self.fps, frame_size)
             self.recording = True
             self.timeout_counter = 0  # Réinitialiser le compteur de timeout
             print("Recording started")
