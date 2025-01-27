@@ -17,7 +17,7 @@ net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
 # Initialisation de la caméra
 cap = cv2.VideoCapture(0)  # 0 pour la caméra par défaut
 
-# Configuration pour l'enregistrement vidéo
+#### Configuration pour l'enregistrement vidéo
 fourcc = cv2.VideoWriter_fourcc(*"MJPG")
 output_file = None
 recording = False
