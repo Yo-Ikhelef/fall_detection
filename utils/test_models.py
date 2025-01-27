@@ -3,6 +3,7 @@ import cv2
 # = intégration de l'ia dans le code
 ## = détection de mouvement
 ### = détection de chute
+#### = enregistrement vidéo
 '''
 
 # Chemins des fichiers
@@ -16,12 +17,19 @@ net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
 # Initialisation de la caméra
 cap = cv2.VideoCapture(0)  # 0 pour la caméra par défaut
 
+#### Configuration pour l'enregistrement vidéo
+fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+output_file = None
+recording = False
+recording_timeout = 100  # Nombre de frames après la dernière détection avant l'arrêt de l'enregistrement
+recording_counter = 0  # Compteur de frames enregistrées depuis la dernière détection
+
 ## Variables pour la détection de mouvement
 previous_frame = None
 motion_threshold = 5000  ## Seuil pour détecter un mouvement significatif
 
 ### Variables pour la détection de chute
-fall_threshold = 0.1  # Réduction de hauteur de 30% considérée comme une chute
+fall_threshold = 0.1  # Réduction de hauteur de 10% cumulé sur le nombre de frame de confirm_fall_frames considérée comme une chute
 person_heights = {}  # Dictionnaire pour stocker les hauteurs précédentes des individus
 fall_frames = {}  # Comptage des frames où une chute est suspectée
 fall_buffer = {}  # Buffer pour éviter les multiples déclenchements
@@ -37,20 +45,29 @@ while True:
     if not ret:
         break
 
+    
+
     ## Conversion en niveaux de gris pour la détection de mouvement
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+
     ## Détection de mouvement
+    motion_detected = False
     if previous_frame is not None:
         frame_diff = cv2.absdiff(previous_frame, gray_frame)
         _, thresh = cv2.threshold(frame_diff, 25, 255, cv2.THRESH_BINARY)
         motion_pixels = cv2.countNonZero(thresh)
 
-        # if motion_pixels > motion_threshold:
-        #     print("Mouvement détecté")
+        if motion_pixels > motion_threshold:
+            motion_detected = True
 
     ## Mettre à jour l'image précédente
     previous_frame = gray_frame
+
+    #### Copie de l'image originale pour l'enregistrement
+    original_frame = frame.copy()
+    #### Prétraitement de l'image pour l'enregistrement
+    height_rec, width_rec, _ = original_frame.shape
 
     # Prétraitement de l'image
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (300, 300), 127.5)
@@ -122,6 +139,27 @@ while True:
             person_heights.pop(person_id, None)
             fall_frames.pop(person_id, None)
             fall_buffer.pop(person_id, None)
+
+    #### Gestion de l'enregistrement
+    if motion_detected:
+        recording = True
+        recording_counter = 0
+        if output_file is None:
+            output_file = cv2.VideoWriter("output.avi", fourcc, 20, (width_rec, height_rec))
+            print("Enregistrement démarré.")
+
+    if recording:
+        output_file.write(original_frame)
+        recording_counter += 1
+
+        if recording_counter > recording_timeout:
+            recording = False
+            output_file.release()
+            output_file = None
+            print("Enregistrement arrêté.")
+
+
+
     # Affichage
     cv2.imshow("Frame", frame)
 
