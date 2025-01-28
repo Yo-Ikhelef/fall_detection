@@ -13,6 +13,8 @@ class FallDetection:
         
         current_person_ids = []
         rectangles = []  # Liste des rectangles à dessiner
+        falls_detected = []
+
         for i in range(detections.shape[2]):
             confidence = detections[0, 0, i, 2]
             if confidence > 0.5:
@@ -36,6 +38,7 @@ class FallDetection:
                                     self.fall_frames[i] = self.fall_frames.get(i, 0) + 1
                                     if self.fall_frames[i] >= self.confirm_frames:
                                         print(f"Fall detected for person {i}")
+                                        # falls_detected.append(i)  # Signaler une chute
                                         self.fall_buffer[i] = self.buffer_duration
                             else:
                                 self.fall_frames[i] = 0
@@ -48,4 +51,4 @@ class FallDetection:
             else:
                 del self.fall_buffer[person_id]
 
-        return current_person_ids, rectangles
+        return current_person_ids, rectangles, falls_detected
