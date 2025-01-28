@@ -3,6 +3,8 @@ from core.VideoProcessor import VideoProcessor
 from core.MotionDetection import MotionDetection
 from core.FallDetection import FallDetection
 from core.VideoRecorder import VideoRecorder
+from app.services.twilio_service import TwilioService
+from decouple import config
 
 
 class Engine:
@@ -11,9 +13,11 @@ class Engine:
         self.motion_detection = MotionDetection()
         self.fall_detection = FallDetection()
         self.video_recorder = VideoRecorder()
+        self.twilio_service = TwilioService()
 
     def run(self):
         while True:
+
             frame = self.video_processor.get_frame()
             if frame is None:
                 break
@@ -28,7 +32,7 @@ class Engine:
             detections = self.video_processor.forward(blob)
 
             # Récupérer les rectangles à dessiner
-            current_person_ids, rectangles = self.fall_detection.analyze_detection(detections, frame.shape)
+            current_person_ids, rectangles, falls_detected = self.fall_detection.analyze_detection(detections, frame.shape)
 
             # Dessiner les rectangles sur la frame
             for (startX, startY, endX, endY, confidence) in rectangles:
@@ -44,7 +48,14 @@ class Engine:
 
             if self.video_recorder.recording:
                 self.video_recorder.write_frame(original_frame, motion_detected)
-                
+
+            # Envoi SMS en cas de chute
+            for person_id in falls_detected:
+                self.twilio_service.send_sms(
+                    to_phone=config("TWILIO_TO_PHONE"), 
+                    message="Alerte : une chute a été détectée !"
+                )
+
             # Affichage
             cv2.imshow("Frame", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
