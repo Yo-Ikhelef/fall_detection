@@ -2,11 +2,14 @@ import cv2
 import os
 import glob
 from datetime import datetime
-
+from collections import deque
+import threading
 
 class VideoRecorder:
-    def __init__(self, output_dir="recordings", fourcc="MJPG", fps=20, timeout=100, max_size_mb=50):
+    def __init__(self, output_dir="recordings", fourcc="MJPG", fps=20, timeout=100, max_size_mb=1000, buffer_seconds=5):
         self.output_dir = output_dir
+        self.detections_dir = os.path.join(self.output_dir, "detections")
+        self.falls_dir = os.path.join(self.output_dir, "falls") 
         self.output_file = None
         self.fourcc = cv2.VideoWriter_fourcc(*fourcc)
         self.fps = fps
@@ -15,16 +18,24 @@ class VideoRecorder:
         self.counter = 0
         self.timeout_counter = 0
         self.max_size_mb = max_size_mb
+        self.buffer_seconds = buffer_seconds
+        self.buffer = deque(maxlen=fps * buffer_seconds)
+        self.lock = threading.Lock()  # Ajout d'un verrou pour éviter les conflits
 
 
-        # Vérifier si le dossier recordings existe, sinon le créer
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+        # Vérifier si tous les dossiers existent, sinon les créer
+        os.makedirs(self.detections_dir, exist_ok=True)  # Crée recordings/detections si absent
+        os.makedirs(self.falls_dir, exist_ok=True)  # Crée recordings/falls si absent
 
-    def _generate_filename(self):
+        self.output_file = None  # Fichier vidéo actif
+
+    def _generate_filename(self, fall=False):
+        """Génère un nom de fichier pour les enregistrements."""
         now = datetime.now()
         timestamp = now.strftime("%d-%m-%Y_%Hh%Mm%Ss")
-        return os.path.join(self.output_dir, f"recording_{timestamp}.avi")
+        folder = self.falls_dir if fall else self.detections_dir
+        prefix = "fall_" if fall else "recording_"
+        return os.path.join(folder, f"{prefix}{timestamp}.avi")
 
     def start_recording(self, frame_size):
         if not self.recording:
@@ -43,6 +54,8 @@ class VideoRecorder:
 
     def write_frame(self, frame, motion_detected):
         """Écrit une frame dans le fichier vidéo si l'enregistrement est actif."""
+        self.buffer.append(frame)
+
         if self.recording:
             self.output_file.write(frame)
 
@@ -59,9 +72,8 @@ class VideoRecorder:
 
     def cleanup_old_files(self):
         # Supprimer les fichiers les plus anciens pour limiter le nombre
-        print("Vérification des fichiers à nettoyer...")  # Étape de débogage
         files = sorted(
-            glob.glob(os.path.join(self.output_dir, "recording_*.avi")),
+            glob.glob(os.path.join(self.detections_dir, "recording_*.avi")),
             key=os.path.getmtime
         )
 
@@ -71,14 +83,36 @@ class VideoRecorder:
 
         #Limiter la taille totale
         total_size = sum(os.path.getsize(f) for f in files) / (1024 * 1024)  # Taille en Mo
-        print(f"Taille totale des enregistrements : {total_size:.2f} Mo")
         while total_size > self.max_size_mb and files:
-            oldest_file = files.pop(0)
-            print(f"Suppression du fichier : {oldest_file}")
             os.remove(files.pop(0))
             total_size = sum(os.path.getsize(f) for f in files) / (1024 * 1024)
-            print(f"Taille restante après suppression : {total_size:.2f} Mo")
 
     def reset_timeout(self):
         """Réinitialiser le timeout lorsque du mouvement est détecté."""
         self.timeout_counter = 0
+
+    def save_fall_clip(self, frame_size, video_processor):
+        """Enregistre une vidéo de chute comprenant les 5s avant et après l'événement."""
+        with self.lock:  # ✅ Empêche d'autres threads de modifier `output_file` en même temps
+            filename = self._generate_filename(fall=True)
+            fall_output = cv2.VideoWriter(filename, self.fourcc, self.fps, frame_size)
+
+            print(f"Saving fall recording: {filename}")
+
+            buffer_copy = list(self.buffer)  # Copie le buffer pour éviter la mutation
+
+            # Écrire les frames du buffer avant la chute
+            for frame in buffer_copy:
+                fall_output.write(frame)
+
+            # Ajouter 5 secondes après la chute
+            for _ in range(self.fps * self.buffer_seconds):
+                frame = video_processor.get_frame()  # Lire les nouvelles frames via VideoProcessor
+                if frame is None:
+                    break
+                fall_output.write(frame)
+
+            fall_output.release()
+
+            # Réinitialiser le buffer après l'enregistrement
+            self.buffer.clear()

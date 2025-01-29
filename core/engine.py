@@ -5,6 +5,7 @@ from core.FallDetection import FallDetection
 from core.VideoRecorder import VideoRecorder
 from app.services.twilio_service import TwilioService
 from decouple import config
+import threading
 
 
 class Engine:
@@ -53,6 +54,12 @@ class Engine:
 
             # Envoi SMS en cas de chute
             for person_id in falls_detected:
+                fall_thread = threading.Thread(
+                        target=self.video_recorder.save_fall_clip, 
+                        args=((frame.shape[1], frame.shape[0]), self.video_processor)
+                )
+                fall_thread.start()  # ✅ Lancer l'enregistrement sans bloquer la boucle principale
+                
                 self.twilio_service.send_sms(
                     to_phone=config("TWILIO_TO_PHONE"), 
                     message="Alerte : une chute a été détectée !"
