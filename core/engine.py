@@ -56,10 +56,10 @@ class Engine:
             for person_id in falls_detected:
                 self.video_recorder.save_fall_clip((frame.shape[1], frame.shape[0]), self.video_processor)
 
-                # self.twilio_service.send_sms(
-                #     to_phone=config("TWILIO_TO_PHONE"), 
-                #     message="Alerte : une chute a été détectée !"
-                # )
+                self.twilio_service.send_sms(
+                    to_phone=config("TWILIO_TO_PHONE"), 
+                    message="Alerte : une chute a été détectée !"
+                )
 
             # Affichage
             cv2.imshow("Frame", frame)
