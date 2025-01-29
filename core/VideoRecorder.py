@@ -20,7 +20,7 @@ class VideoRecorder:
         self.max_size_mb = max_size_mb
         self.buffer_seconds = buffer_seconds
         self.buffer = deque(maxlen=fps * buffer_seconds)
-        self.lock = threading.Lock()  # Ajout d'un verrou pour éviter les conflits
+        self.is_recording_fall = False  # ✅ Flag pour savoir si on enregistre une chute
 
 
         # Vérifier si tous les dossiers existent, sinon les créer
@@ -38,7 +38,7 @@ class VideoRecorder:
         return os.path.join(folder, f"{prefix}{timestamp}.avi")
 
     def start_recording(self, frame_size):
-        if not self.recording:
+        if not self.recording and not self.is_recording_fall:
             filename = self._generate_filename()
             self.output_file = cv2.VideoWriter(filename, self.fourcc, self.fps, frame_size)
             self.recording = True
@@ -52,11 +52,11 @@ class VideoRecorder:
             self.recording = False
             print("Recording stopped")
 
-    def write_frame(self, frame, motion_detected):
+    def write_frame(self, frame, motion_detected, fall_detected=False, skip_recording=False):
         """Écrit une frame dans le fichier vidéo si l'enregistrement est actif."""
         self.buffer.append(frame)
 
-        if self.recording:
+        if self.recording and not skip_recording:
             self.output_file.write(frame)
 
             # Si aucun mouvement n'est détecté, incrémenter le timeout
@@ -92,27 +92,31 @@ class VideoRecorder:
         self.timeout_counter = 0
 
     def save_fall_clip(self, frame_size, video_processor):
-        """Enregistre une vidéo de chute comprenant les 5s avant et après l'événement."""
-        with self.lock:  # ✅ Empêche d'autres threads de modifier `output_file` en même temps
-            filename = self._generate_filename(fall=True)
-            fall_output = cv2.VideoWriter(filename, self.fourcc, self.fps, frame_size)
+        """Créer un enregistrement spécial pour la chute."""
+        if self.is_recording_fall:
+            return  # ✅ Évite plusieurs enregistrements simultanés
 
-            print(f"Saving fall recording: {filename}")
+        self.is_recording_fall = True
+        self.stop_recording()  # ✅ Stopper l'enregistrement standard avant
 
-            buffer_copy = list(self.buffer)  # Copie le buffer pour éviter la mutation
+        filename = self._generate_filename(fall=True)
+        fall_output = cv2.VideoWriter(filename, self.fourcc, self.fps, frame_size)
 
-            # Écrire les frames du buffer avant la chute
-            for frame in buffer_copy:
-                fall_output.write(frame)
+        print(f"⚠️ Enregistrement de la chute : {filename}")
 
-            # Ajouter 5 secondes après la chute
-            for _ in range(self.fps * self.buffer_seconds):
-                frame = video_processor.get_frame()  # Lire les nouvelles frames via VideoProcessor
-                if frame is None:
-                    break
-                fall_output.write(frame)
+        buffer_copy = list(self.buffer)
+        for frame in buffer_copy:
+            fall_output.write(frame)
 
-            fall_output.release()
+        # ✅ Capturer 5 secondes après la chute
+        for _ in range(self.fps * self.buffer_seconds):
+            frame = video_processor.get_frame()             
+            if frame is None:
+                break
+            fall_output.write(frame)
 
-            # Réinitialiser le buffer après l'enregistrement
-            self.buffer.clear()
+        fall_output.release()
+        self.is_recording_fall = False
+        self.buffer.clear()  # ✅ Vider le buffer après utilisation
+
+        print(f"✅ Enregistrement de la chute terminé : {filename}")

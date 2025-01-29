@@ -43,7 +43,7 @@ class Engine:
 
 
             # Enregistrement vidéo
-            if motion_detected:
+            if motion_detected and not self.video_recorder.is_recording_fall:
                 self.video_recorder.start_recording((frame.shape[1], frame.shape[0]))
                 self.video_recorder.reset_timeout()
 
@@ -54,16 +54,12 @@ class Engine:
 
             # Envoi SMS en cas de chute
             for person_id in falls_detected:
-                fall_thread = threading.Thread(
-                        target=self.video_recorder.save_fall_clip, 
-                        args=((frame.shape[1], frame.shape[0]), self.video_processor)
-                )
-                fall_thread.start()  # ✅ Lancer l'enregistrement sans bloquer la boucle principale
-                
-                self.twilio_service.send_sms(
-                    to_phone=config("TWILIO_TO_PHONE"), 
-                    message="Alerte : une chute a été détectée !"
-                )
+                self.video_recorder.save_fall_clip((frame.shape[1], frame.shape[0]), self.video_processor)
+
+                # self.twilio_service.send_sms(
+                #     to_phone=config("TWILIO_TO_PHONE"), 
+                #     message="Alerte : une chute a été détectée !"
+                # )
 
             # Affichage
             cv2.imshow("Frame", frame)
