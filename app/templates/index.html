@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des Enregistrements{% endblock %}
+
+{% block content %}
+    <h2>Historique</h2>
+    <div class="record-container">
+        <h3>Enregistrement n° </h3>
+    </div>
+    <ul>
+        {% for enregistrement in enregistrements %}
+        <div class="record-container">
+            <li>
+                <a href="{{ url_for('telecharger_video', filename=enregistrement.nom) }}">
+                    📹 Enregistrement {{ enregistrement.id }} - {{ enregistrement.nom }}
+                </a>
+            </li>
+        </div>
+        {% endfor %}
+    </ul>
+{% endblock %}
