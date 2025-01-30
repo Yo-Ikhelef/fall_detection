@@ -1,3 +1,14 @@
+
+from app import create_app  
+import numpy as np
+import cv2
+
+app = create_app()  
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=8000)
+
+
 # from flask import Flask
 # import threading
 # from core.engine import Engine
@@ -31,11 +42,3 @@
 #     # Assurer que les deux threads fonctionnent
 #     flask_thread.join()
 #     engine_thread.join()
-
-from core.engine import Engine
-
-if __name__ == "__main__":
-    # Instancier l'engine
-    engine = Engine()
-    # Lancer l'engine
-    engine.run()

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Titre par défaut{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="title-container">
+            <img class="logo" src="../static/img/FallGuard-Logo.png" alt="Logo représentant une personne agée en train de chuter à l'intérieur d'un bouclier">
+            <h1>FallGuard</h1>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; FallGuard 2025. Tous droits réservés.</p>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
