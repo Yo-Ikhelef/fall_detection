@@ -4,18 +4,19 @@
 
 {% block content %}
     <h2>Historique</h2>
-    <div class="record-container">
-        <h3>Enregistrement n° </h3>
-    </div>
-    <ul>
-        {% for enregistrement in enregistrements %}
-        <div class="record-container">
-            <li>
-                <a href="{{ url_for('recordings/falls', filename='fall_30-01-2025_10h28m00s.avi') }}">
-                    📹 Enregistrement {{ enregistrement.id }} - {{ enregistrement.nom }}
-                </a>
-            </li>
-        </div>
-        {% endfor %}
-    </ul>
+   
+    {% if fall_recordings %}
+        <ul>
+            {% for recording in fall_recordings %}
+                <li class="record-container">
+                    <a href="{{ url_for('download_video', directory='falls', filename=recording.name) }}">    
+                        📹 Enregistrement {{ recording.id }} - {{ recording.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun enregistrement pour le moment.</p>
+    {% endif %}
+
 {% endblock %}

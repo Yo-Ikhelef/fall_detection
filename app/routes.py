@@ -1,40 +1,31 @@
-from flask import render_template
+from flask import render_template, send_from_directory, abort
+import os
+
+FALLS_DIR = os.path.abspath("recordings/falls") 
 
 def setup_routes(app):
     @app.route('/')
     def home():
-        return render_template('index.html')
+        # Récupérer les enregistrements de chute (fall_*)
+        fall_recordings = [
+                {"id": i+1, "name": f} 
+                for i, f in enumerate(sorted(os.listdir(FALLS_DIR), reverse=True))
+                if f.startswith("fall_") and f.endswith(".avi")
+        ]
+        return render_template('index.html', fall_recordings=fall_recordings)
+    
+    @app.route('/telecharger/<directory>/<filename>')
+    def download_video(directory, filename):
+        """Télécharge une vidéo depuis le dossier spécifié."""
+        if directory == "falls":
+            directory_path = FALLS_DIR
+        else:
+            return abort(403)  # Sécurité : interdiction d'accéder à d'autres dossier
 
-#    @app.route('/settings')
-#    def settings():
-#        return render_template('settings.html')
+        file_path = os.path.join(directory_path, filename)
 
-    @app.route('/enregistrement')
-    def enregistrement():
-        return render_template('enregistrement.html')
-
-
-# ----------------------------
-
-# from flask import render_template, request, jsonify
-# from app import app
-# import os
-
-# @app.route("/")
-# def index():
-#    return render_template("index.html")
-
-# @app.route("/videos")
-# def list_videos():
-#     videos = os.listdir("recordings")
-#     return render_template("videos.html", videos=videos)
-
-# @app.route("/settings", methods=["GET", "POST"])
-# def settings():
-#     if request.method == "POST":
-        # Mettre à jour les paramètres
-#         data = request.json
-        # Exemple de mise à jour des paramètres dans un fichier config
-#         return jsonify({"status": "success"})
-#     return render_template("settings.html")
-
+        # 🔹 Vérification du fichier et affichage debug
+        print(f"Recherche du fichier : {file_path}")
+        if os.path.exists(file_path):
+            return send_from_directory(directory_path, filename, as_attachment=True)
+        return abort(404)  # Page 404 si le fichier n'existe pas
