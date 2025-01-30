@@ -22,3 +22,6 @@ recordings/
 
 # Dépendances (peuvent être installées via requirements.txt)
 *.egg-info/
+
+*.mp4
+*.avi

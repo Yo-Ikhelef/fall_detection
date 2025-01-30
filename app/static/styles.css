@@ -23,6 +23,10 @@ html {
     color: #060805;
 }
 
+li {
+    list-style-type: none;
+}
+
 h1 {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     font-size: 4rem;

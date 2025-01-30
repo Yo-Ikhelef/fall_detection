@@ -1,34 +1,44 @@
+
 from app import create_app  
 import numpy as np
 import cv2
 
 app = create_app()  
 
-print("NumPy version:", np.__version__)
-print("OpenCV version:", cv2.__version__)
-
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8000)
 
 
-# --------------------------------------------------------
-
 # from flask import Flask
-# import numpy as np
-# import cv2
+# import threading
+# from core.engine import Engine
 
+# # Initialisation de Flask
 # app = Flask(__name__)
 
+# # Route Flask pour la page principale
 # @app.route('/')
 # def home():
-#    return "Hello, World! Ceci est ma page principale."
+#     return "Interface Flask en cours d'exécution. Les vidéos sont enregistrées automatiquement."
 
-# print("NumPy version:", np.__version__)
-# print("OpenCV version:", cv2.__version__)
+# # Fonction pour démarrer Flask
+# def run_flask():
+#     app.run(debug=False, host="0.0.0.0", port=8000)
 
+# # Fonction pour démarrer l'engine
+# def run_engine():
+#     engine = Engine()
+#     engine.run()
 
 # if __name__ == "__main__":
-#     app.run(debug=True, host="0.0.0.0", port=8000)
+#     # Lancer Flask et l'engine en parallèle
+#     flask_thread = threading.Thread(target=run_flask)
+#     engine_thread = threading.Thread(target=run_engine)
 
+#     # Démarrage des threads
+#     flask_thread.start()
+#     engine_thread.start()
 
-
+#     # Assurer que les deux threads fonctionnent
+#     flask_thread.join()
+#     engine_thread.join()
