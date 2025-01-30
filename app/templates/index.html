@@ -11,7 +11,7 @@
         {% for enregistrement in enregistrements %}
         <div class="record-container">
             <li>
-                <a href="{{ url_for('telecharger_video', filename=enregistrement.nom) }}">
+                <a href="{{ url_for('recordings/falls', filename='fall_30-01-2025_10h28m00s.avi') }}">
                     📹 Enregistrement {{ enregistrement.id }} - {{ enregistrement.nom }}
                 </a>
             </li>
