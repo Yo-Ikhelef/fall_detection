@@ -1,0 +1,25 @@
+A faire sur raspberry:
+
+-Installer version tensorflow pour raspberry: tflite-runtime (.whl) ( pour l'integration de MobileNet)
+
+
+#Itstudents account
+
+twilio recovery code: RW3HQA2F1SBVFUBXZFVV9NN7
+
+account SID: AC6fd95afe3ffd0efb4d56b9c83d21a052
+
+auth token: 8d932c90b4f2bbc33daeae9442202cc7
+
+twilio number: +12196668599
+
+#ikhelef.y@gmail.com
+
+twilio recovery code: TFHP14755C6CUWMSRVLA5C6H
+
+account SID: AC5f255702da07cee238cc906e005d3e33
+
+auth token: e59bf3bb3e421152a38fba568aff2541
+
+twilio number: +18288454702
+ 

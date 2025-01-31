@@ -47,6 +47,7 @@ class Engine:
                 self.video_recorder.start_recording((frame.shape[1], frame.shape[0]))
                 self.video_recorder.reset_timeout()
 
+                self.video_recorder.cleanup_old_files()
 
             if self.video_recorder.recording:
                 self.video_recorder.write_frame(original_frame, motion_detected)
@@ -60,11 +61,8 @@ class Engine:
                     message="Alerte : une chute a été détectée !"
                 )
 
-            self.video_recorder.cleanup_old_files()
-            
-
             # Affichage
-            cv2.imshow("Frame", frame)
+            # cv2.imshow("Frame", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 

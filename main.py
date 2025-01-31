@@ -35,11 +35,17 @@
 #     flask_thread.join()
 #     engine_thread.join()
 
+import sys
+import os
 from flask import Flask
 import threading
 from core.engine import Engine
 from app.routes import setup_routes
 import time
+
+os.environ["QT_QPA_PLATFORM"] = "offscreen"
+os.environ["DISPLAY"] = ""
+
 
 # Initialisation de Flask
 def create_app():
