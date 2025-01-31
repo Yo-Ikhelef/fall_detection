@@ -38,7 +38,7 @@ class FallDetection:
                                     self.fall_frames[i] = self.fall_frames.get(i, 0) + 1
                                     if self.fall_frames[i] >= self.confirm_frames:
                                         print(f"Fall detected for person {i}")
-                                        # falls_detected.append(i)  # Signaler une chute
+                                        falls_detected.append(i)  # Signaler une chute
                                         self.fall_buffer[i] = self.buffer_duration
                             else:
                                 self.fall_frames[i] = 0

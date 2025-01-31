@@ -1,38 +1,22 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil - FallDetection</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-    <header>
-        <nav>
-        <img src="{{ url_for('static', filename='images/falllogo.png') }}" alt="FallDetection Logo" class="logo">
-            <a href="/">Accueil</a>
-            <a href="/videos">Vidéos</a>
-            <a href="/settings">Paramètres</a>
-            {% if 'user' in session %}
-            <span>Bienvenue, {{ session['user'] }}!</span>
-            <a href="/logout">Déconnexion</a>
-            {% else %}
-            <a href="/login">Connexion</a>
-            {% endif %}
-        </nav>
-    </header>
-    
-    <section class="promotion">
-        <div class="promotion-content">
-            <p>
-                Notre solution innovante de surveillance des chutes offre une sécurité accrue pour les personnes âgées, permettant à leurs proches et professionnels de santé d'être alertés instantanément en cas de chute. Grâce à une technologie de détection avancée et une interface conviviale, nous garantissons une prise en charge rapide et efficace pour assurer le bien-être des aînés. Protégez vos proches avec notre solution de surveillance et de prévention des chutes.
-            </p>
-        </div>
-        <div class="promotion-image">
-            <img src="{{ url_for('static', filename='images/camo.png') }}" alt="Surveillance de chute des personnes âgées">
-        </div>
-    </section>
-    
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Liste des Enregistrements{% endblock %}
+
+{% block content %}
+    <h2>Historique</h2>
+   
+    {% if fall_recordings %}
+        <ul>
+            {% for recording in fall_recordings %}
+                <li class="record-container">
+                    <a href="{{ url_for('download_video', directory='falls', filename=recording.name) }}">    
+                        📹 Enregistrement {{ recording.id }} - {{ recording.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun enregistrement pour le moment.</p>
+    {% endif %}
+
+{% endblock %}
