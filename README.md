@@ -1,6 +1,9 @@
-Statut: Projet fonctionnel malgré un comportement inattendu ou l'on perd des frames sur les enregistrements de chutes.  
+**Groupe:** Camille GENTILI, Tristan JACQUEMARD, Matthieu GARCIA, Nathan BERTRAND, Youri IKHELEF  
+
+
+**Statut:** Projet fonctionnel malgré un comportement inattendu ou l'on perd des frames sur les enregistrements de chutes.  
 branche main pour tester en local, branche rasp_integration pour la version parametré sur le raspberry.  
-Edit: Ne pas développer en wsl car ce dernier ne peux pas récupérer l'acces a la caméra. 
+**Edit:** Ne pas développer en wsl car ce dernier ne peux pas récupérer l'acces a la caméra. 
 
 
 # Afin d'initialiser le projet pour développer localement suivre les étapes:
