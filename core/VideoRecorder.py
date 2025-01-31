@@ -22,6 +22,7 @@ class VideoRecorder:
         self.buffer = deque(maxlen=fps * buffer_seconds)
         self.is_recording_fall = False  # ✅ Flag pour savoir si on enregistre une chute
         self.max_fall_files = max_fall_files
+        self.lock = threading.Lock()  # ✅ Verrou pour éviter les suppressions simultanées
 
 
         # Vérifier si tous les dossiers existent, sinon les créer
@@ -72,29 +73,30 @@ class VideoRecorder:
                 self.reset_timeout()
 
     def cleanup_old_files(self):
-        # Supprimer les fichiers les plus anciens pour limiter le nombre
-        files = sorted(
-            glob.glob(os.path.join(self.detections_dir, "recording_*.avi")),
-            key=os.path.getmtime
-        )
+        with self.lock:  # ✅ Empêche d'autres threads d'accéder aux fichiers en même temps
+            # Supprimer les fichiers les plus anciens pour limiter le nombre
+            files = sorted(
+                glob.glob(os.path.join(self.detections_dir, "recording_*.avi")),
+                key=os.path.getmtime
+            )
 
-        fall_files = sorted(
-            glob.glob(os.path.join(self.falls_dir, "fall_*.avi")),
-            key=os.path.getmtime
-        )
+            fall_files = sorted(
+                glob.glob(os.path.join(self.falls_dir, "fall_*.avi")),
+                key=os.path.getmtime
+            )
 
-        if not files and not fall_files:
-            print("Aucun fichier trouvé pour suppression.")
-            return
+            if not files and not fall_files:
+                print("Aucun fichier trouvé pour suppression.")
+                return
 
-        while len(fall_files) > self.max_fall_files:
-            os.remove(fall_files.pop(0))
+            while len(fall_files) > self.max_fall_files:
+                os.remove(fall_files.pop(0))
 
-        #Limiter la taille totale en supprimant les enregistrements de detection les plus anciens
-        total_size = sum(os.path.getsize(f) for f in files) / (1024 * 1024)  # Taille en Mo
-        while total_size > self.max_size_mb and files:
-            os.remove(files.pop(0))
-            total_size = sum(os.path.getsize(f) for f in files) / (1024 * 1024)
+            #Limiter la taille totale en supprimant les enregistrements de detection les plus anciens
+            total_size = sum(os.path.getsize(f) for f in files) / (1024 * 1024)  # Taille en Mo
+            while total_size > self.max_size_mb and files:
+                os.remove(files.pop(0))
+                total_size = sum(os.path.getsize(f) for f in files) / (1024 * 1024)
 
     def reset_timeout(self):
         """Réinitialiser le timeout lorsque du mouvement est détecté."""
@@ -129,3 +131,4 @@ class VideoRecorder:
         self.buffer.clear()  # ✅ Vider le buffer après utilisation
 
         print(f"✅ Enregistrement de la chute terminé : {filename}")
+        
