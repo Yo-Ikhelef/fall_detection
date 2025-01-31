@@ -6,7 +6,7 @@ from collections import deque
 import threading
 
 class VideoRecorder:
-    def __init__(self, output_dir="recordings", fourcc="MJPG", fps=20, timeout=100, max_size_mb=1000, max_fall_files=5, buffer_seconds=5):
+    def __init__(self, output_dir="recordings", fourcc="MJPG", fps=20, timeout=100, max_size_mb=200, max_fall_files=5, buffer_seconds=5):
         self.output_dir = output_dir
         self.detections_dir = os.path.join(self.output_dir, "detections")
         self.falls_dir = os.path.join(self.output_dir, "falls") 
