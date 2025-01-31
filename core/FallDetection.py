@@ -1,7 +1,7 @@
 import cv2
 
 class FallDetection:
-    def __init__(self, fall_threshold=0.1, confirm_frames=2, buffer_duration=10):
+    def __init__(self, fall_threshold=0.01, confirm_frames=2, buffer_duration=10):
         self.fall_threshold = fall_threshold
         self.confirm_frames = confirm_frames
         self.buffer_duration = buffer_duration
