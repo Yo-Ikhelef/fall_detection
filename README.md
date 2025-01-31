@@ -1,3 +1,8 @@
+Statut: Projet fonctionnel malgré un comportement inattendu ou l'on perd des frames sur les enregistrements de chutes.  
+branche main pour tester en local, branche rasp_integration pour la version parametré sur le raspberry.  
+Edit: Ne pas développer en wsl car ce dernier ne peux pas récupérer l'acces a la caméra. 
+
+
 # Afin d'initialiser le projet pour développer localement suivre les étapes:
 
 ## 1. Installer Python 3.9.2 ( la derniere version 3.11.2 peux probablement fonctionner)
@@ -45,6 +50,13 @@ Sur Linux :
 Sur Windows/macOS :
 
 Ces dépendances sont incluses avec les versions pip d’OpenCV. Aucune installation supplémentaire n’est nécessaire.
+
+## 5. Lancer l'application
+
+A la racine du projet, lancer:
+`python main.py`
+
+sur navigateur acceder a l'interface Flask à l'url: localhost:8000
 
 
 
