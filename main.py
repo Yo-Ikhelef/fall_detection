@@ -32,6 +32,12 @@
 #     flask_thread.join()
 #     engine_thread.join()
 
+import sys
+import os
+
+os.environ["QT_QPA_PLATFORM"] = "offscreen"
+os.environ["DISPLAY"] = ""
+
 from core.engine import Engine
 
 if __name__ == "__main__":

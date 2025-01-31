@@ -51,13 +51,14 @@ class Engine:
 
             # Envoi SMS en cas de chute
             for person_id in falls_detected:
+                print("Envoie de sms")
                 self.twilio_service.send_sms(
                     to_phone=config("TWILIO_TO_PHONE"), 
                     message="Alerte : une chute a été détectée !"
                 )
 
             # Affichage
-            cv2.imshow("Frame", frame)
+            # cv2.imshow("Frame", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
