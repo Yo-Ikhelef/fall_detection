@@ -1,6 +1,5 @@
 Planning (Trello):  https://trello.com/b/hc6pgelo/fall-detection
 Documentation :
 https://docs.google.com/document/d/1AYT2eTF4RmnrjjdyWq5PFMTtH7cjmwvAnGUn0sKGI-I/edit?usp=sharing
-Github : https://github.com/Yo-Ikhelef/fall_detection
 Documentation initial pour la conception :
 https://docs.google.com/document/d/19tH2FTPRUnbhYFJOznQP-s5dHsXOrwA4QJIodvYUYUU/edit?tab=t.0#heading=h.d6qusfg3rko8
